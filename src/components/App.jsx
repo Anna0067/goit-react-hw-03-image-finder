@@ -17,6 +17,7 @@ const App = () => {
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [modalImage, setModalImage] = useState('');
+  const [hasMore, setHasMore] = useState(true);
 
   useEffect(() => {
     if (!query) return;
@@ -27,7 +28,12 @@ const App = () => {
         const response = await axios.get(
           `${apiUrl}?q=${query}&page=${page}&key=${apiKey}&image_type=photo&orientation=horizontal&per_page=12`
         );
-        setImages(prevImages => [...prevImages, ...response.data.hits]);
+
+        if (response.data.hits.length === 0) {
+          setHasMore(false);
+        } else {
+          setImages(prevImages => [...prevImages, ...response.data.hits]);
+        }
       } catch (error) {
         console.error('Error fetching images:', error);
       } finally {
@@ -42,10 +48,13 @@ const App = () => {
     setQuery(searchQuery);
     setImages([]);
     setPage(1);
+    setHasMore(true);
   };
 
   const loadMore = () => {
-    setPage(prevPage => prevPage + 1);
+    if (hasMore) {
+      setPage(prevPage => prevPage + 1);
+    }
   };
 
   const openModal = imageUrl => {
@@ -63,7 +72,9 @@ const App = () => {
       <Searchbar onSubmit={handleSearch} />
       <ImageGallery images={images} onImageClick={openModal} />
       {loading && <Loader />}
-      {images.length > 0 && !loading && <Button onClick={loadMore} />}
+      {images.length > 0 && !loading && hasMore && (
+        <Button onClick={loadMore} />
+      )}
       {showModal && <Modal imageUrl={modalImage} onClose={closeModal} />}
     </div>
   );
