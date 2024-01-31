@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import styles from './styles.module.css';
 
 const Modal = ({ imageUrl, onClose }) => {
   return (
-    <div className="Overlay" onClick={onClose}>
-      <div className="Modal">
+    <div className={styles.Overlay} onClick={onClose}>
+      <div className={styles.Modal}>
         <img src={imageUrl} alt="" />
       </div>
     </div>
